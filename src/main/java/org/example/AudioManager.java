@@ -5,11 +5,30 @@ import java.io.File;
 import java.io.IOException;
 
 public class AudioManager {
+
+    /**
+     * El Clip de audio de fondo del juego.
+     */
     public static Clip backgroundClip;
+
+    /**
+     * El archivo de audio para el Clip de audio de fondo.
+     */
     public static File backgroundClipFile;
+
+    /**
+     * El archivo de audio para el Clip de salto.
+     */
     public static File jumpClipFile;
+
+    /**
+     * El archivo de audio para el Clip de fin de juego.
+     */
     public static File gameOverClipFile;
 
+    /**
+     * Inicializa el audio de fondo del juego.
+     */
     static void initializeBackgroundAudio() {
         System.out.println(AudioManager.backgroundClipFile);
         try {
@@ -23,8 +42,9 @@ public class AudioManager {
         }
     }
 
-
-    // Método para detener el audio de fondo
+    /**
+     * Detiene el audio de fondo del juego.
+     */
     public static void stopBackgroundAudio() {
         try {
             // Obtiene información de todos los mezcladores de audio
@@ -38,6 +58,5 @@ public class AudioManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }

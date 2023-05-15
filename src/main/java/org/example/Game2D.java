@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Game2D extends JPanel {
     public static final int WIDTH = 800;
@@ -22,7 +23,10 @@ public class Game2D extends JPanel {
 
 
 
+
+
     private boolean isGamePause=false;
+    private boolean isStartScreen = true;
     private int circleX;
     private int circleY;
     private int circleRadius;
@@ -50,6 +54,9 @@ public class Game2D extends JPanel {
 
     public static int lives = 3;
     public static int maxLives=3;
+
+
+
 
 
 
@@ -152,15 +159,21 @@ public class Game2D extends JPanel {
                 @Override
                 public void keyPressed(KeyEvent e) {
                     int keyCode = e.getKeyCode();
-                    if ((keyCode == KeyEvent.VK_SPACE || keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_W) && !Player.isJumping) {
+                    if ((keyCode == KeyEvent.VK_UP ) && !Player.isJumping) {
                         Player.jump();
-                    } else if (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_A) {
+                    } else if (keyCode == KeyEvent.VK_LEFT ) {
                         Player.movingLeft = true;
-                    } else if (keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_D) {
+                    } else if (keyCode == KeyEvent.VK_RIGHT ) {
                         Player.movingRight = true;
                     }
                 }
             });
+
+
+
+
+
+
             addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyReleased(KeyEvent e) {
@@ -184,6 +197,10 @@ public class Game2D extends JPanel {
                     int keyCode = e.getKeyCode();
                     if ((keyCode == KeyEvent.VK_SPACE || keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_W) && !Player.isJumping) {
                         Player.jump();
+                    }else if (keyCode == KeyEvent.VK_ESCAPE) {
+                        // Agrega aquí el código que deseas ejecutar al presionar "Esc"
+                        // Por ejemplo, puedes llamar a un método para pausar el juego
+                        pauseGame();
                     }
                 }
             });
@@ -224,6 +241,10 @@ public class Game2D extends JPanel {
                 int keyCode = e.getKeyCode();
                 if ((keyCode == KeyEvent.VK_SPACE || keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_W) && !Player.isJumping) {
                     Player.jump();
+                }else if (keyCode == KeyEvent.VK_ESCAPE) {
+                    // Agrega aquí el código que deseas ejecutar al presionar "Esc"
+                    // Por ejemplo, puedes llamar a un método para pausar el juego
+                    pauseGame();
                 }
             }});
         gameTimer.start();
@@ -248,10 +269,12 @@ public class Game2D extends JPanel {
             Player.playerX -= playerSpeed;
         }
 
+
         // Mueve el jugador hacia la derecha
         if (Player.movingRight) {
             Player.playerX += playerSpeed;
         }
+
 
         // Limita la posición del jugador para que no se salga de la pantalla
         if (Player.playerX < 0) {
@@ -259,6 +282,11 @@ public class Game2D extends JPanel {
         } else if (Player.playerX + Player.PLAYER_SIZE > WIDTH) {
             Player.playerX = WIDTH - Player.PLAYER_SIZE;
         }
+
+
+
+
+
 
         // Comprueba si el jugador ha alcanzado el suelo o una plataforma
         if (Player.playerY >= HEIGHT - Player.PLAYER_SIZE) {
@@ -269,11 +297,21 @@ public class Game2D extends JPanel {
             // Marca que el jugador no está saltando
             Player.isJumping = false;
         }
+
+
+
+
+
+
         // Itera a través de la lista de obstáculos
         for (Rectangle obstacle : Obstacle.obstacles) {
             // Calcula la posición del jugador considerando su movimiento
             int playerRight = Player.playerX + Player.PLAYER_SIZE;
             int playerBottom = Player.playerY + Player.PLAYER_SIZE;
+
+
+
+
             // Actualiza la posición horizontal del obstáculo moviéndolo hacia la izquierda
             obstacle.x -= Obstacle.OBSTACLE_SPEED;
             // Comprueba si el obstáculo ha salido completamente de la pantalla
@@ -327,6 +365,22 @@ public class Game2D extends JPanel {
                 }
 
             }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             if (Obstacle.firstObstacle) {
                 // si el jugador pasó el primer obstáculo
                 if (Player.playerY >= HEIGHT - Player.PLAYER_SIZE) {
@@ -353,6 +407,10 @@ public class Game2D extends JPanel {
                         gameOver();
                     }
                 }
+
+
+
+
             }
 
 
@@ -380,19 +438,30 @@ public class Game2D extends JPanel {
     }
 
 
-
+    /**
+     * Constructor de la clase MovingCircle.
+     * Inicializa la ventana del juego y genera un círculo.
+     */
 
     public void MovingCircle() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         generateCircle();
         startAnimation();
     }
-
+    /**
+     * Genera la posición inicial del círculo.
+     * La posición en el eje x se establece al extremo derecho de la ventana.
+     * La posición en el eje y se genera aleatoriamente dentro de los límites de la ventana.
+     */
     private void generateCircle() {
         Random random = new Random();
         circleX = WIDTH - circleRadius; // Inicializamos la posición del círculo al extremo derecho de la ventana
         circleY = random.nextInt(HEIGHT - circleRadius); // Generamos una posición "y" aleatoria dentro de los límites de la ventana
     }
+    /**
+     * Inicia la animación del círculo.
+     * Crea un hilo de ejecución que actualiza la posición del círculo, verifica colisiones y repinta la ventana.
+     */
 
     private void startAnimation() {
         Thread animationThread = new Thread(() -> {
@@ -411,7 +480,11 @@ public class Game2D extends JPanel {
 
         animationThread.start();
     }
-
+    /**
+     * Actualiza la posición del círculo en función del movimiento del enemigo.
+     * Si el enemigo está en movimiento, la posición horizontal del círculo se decrementa.
+     * Si el círculo sale de la ventana por la izquierda, se genera una nueva posición inicial.
+     */
     private void moveCircle() {
         if (Enemy.isEnemyMoving) {
             circleX -= Enemy.ENEMY_SPEED;
@@ -422,7 +495,10 @@ public class Game2D extends JPanel {
         }
     }
 
-
+    /**
+     * Comprueba si hay colisión entre el jugador y el círculo.
+     * Si se produce una colisión, se ejecutan las acciones correspondientes.
+     */
     private void checkCollision() {
         // Calcula el centro del círculo
         int circleCenterX = circleX + (circleRadius / 2);
@@ -432,32 +508,33 @@ public class Game2D extends JPanel {
         double distance = Math.sqrt(Math.pow(Player.playerX + (Player.PLAYER_SIZE / 2) - circleCenterX, 2) + Math.pow(Player.playerY + (Player.PLAYER_SIZE / 2) - circleCenterY, 2));
 
         // Comprueba si hay colisión entre el jugador y el círculo
-        if (distance <= (Player.PLAYER_SIZE / 2) + (circleRadius / 2)) {
-            System.out.println("chocaste con el circulo");
+        if (Enemy.ENEMY) {
+            if (distance <= (Player.PLAYER_SIZE / 2) + (circleRadius / 2)) {
+                System.out.println("chocaste con el circulo");
 
-            // Se produjo una colisión
-            if (lives > 1) {
-                // si tienes vidas
-                // bajar 1 vida y regresar a la posición de inicio
-                lives=lives-1;
-                Player.resetPlayerPosition();
-                Thread thread = new Thread(() -> {
-                    try {
-                        Thread.sleep(300);
-                        // Cambiar la imagen del personaje a la imagen original
-                        Player.playerImage = Player.walkingPlayerImage;
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                });
-                thread.start();
-                // Cambiar la imagen del personaje después de tocar el suelo
-                Player.playerImage = Player.playerDamageImage;
+                // Se produjo una colisión
+                if (lives > 1) {
+                    // si tienes vidas
+                    // bajar 1 vida y regresar a la posición de inicio
+                    lives--;
+                    Player.resetPlayerPosition();
+                    Thread thread = new Thread(() -> {
+                        try {
+                            Thread.sleep(300);
+                            // Cambiar la imagen del personaje a la imagen original
+                            Player.playerImage = Player.walkingPlayerImage;
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    thread.start();
+                    // Cambiar la imagen del personaje después de tocar el suelo
+                    Player.playerImage = Player.playerDamageImage;
 
-            } else {
-                // si no tienes vidas, se termina el juego
-
-                gameOver();
+                } else {
+                    // si no tienes vidas, se termina el juego
+                    gameOver();
+                }
             }
         }
     }
@@ -470,7 +547,12 @@ public class Game2D extends JPanel {
 
 
 
-    private  void pauseGame(){
+    /**
+     * Pausa el juego.
+     * Detiene el movimiento del enemigo y muestra la pantalla de pausa.
+     * Permite reiniciar el juego al presionar la tecla "R".
+     */
+    private void pauseGame() {
         isGamePause = true;
         Enemy.isEnemyMoving = false;
         gameTimer.stop();
@@ -487,17 +569,27 @@ public class Game2D extends JPanel {
                 }
             }
         });
-
     }
-    private  void restartGame(){
+
+    /**
+     * Reinicia el juego.
+     * Restablece el estado de pausa, el movimiento del enemigo y reinicia el temporizador del juego.
+     * Vuelve a dibujar la pantalla para quitar la pantalla de pausa.
+     */
+    private void restartGame() {
         // Agrega aquí el código para reiniciar el juego
         isGamePause = false; // Restablecer el estado de pausa
         Enemy.isEnemyMoving = true; // Restablecer el movimiento del enemigo
         gameTimer.start(); // Reiniciar el temporizador del juego
         requestFocus(); // Establecer el enfoque en el componente
         repaint(); // Volver a dibujar la pantalla para quitar "pause"
-
     }
+
+    /**
+     * Muestra la pantalla de fin de juego.
+     * Detiene el temporizador del juego, detiene el audio de fondo y muestra la puntuación final.
+     * Permite reiniciar el juego o salir del programa.
+     */
     private void gameOver() {
         gameTimer.stop();
         AudioManager.stopBackgroundAudio();
@@ -537,8 +629,6 @@ public class Game2D extends JPanel {
                 new String[]{"Restart", "Exit"},
                 "Restart");
 
-
-
         if (choice == JOptionPane.YES_OPTION) {
             Player.resetVariables();
             Obstacle.obstacles.clear();
@@ -550,102 +640,143 @@ public class Game2D extends JPanel {
         } else {
             System.exit(0);
         }
-
+    }
+    /**
+     * Muestra la pantalla de inicio.
+     * Detiene el temporizador del juego y muestra un mensaje para comenzar el juego al presionar "Enter".
+     */
+    private void startScreen() {
+        JPanel panel = new JPanel();
+        JLabel label = new JLabel("Presiona 'ENTER' para comenzar");
+        label.setFont(new Font("Arial", Font.BOLD, 24));
+        panel.add(label);
+        panel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.setAlignmentY(Component.CENTER_ALIGNMENT);
+        add(panel);
+        isStartScreen = false;
+        Enemy.isEnemyMoving = false;
+        gameTimer.stop();
+        requestFocus(); // Establecer el enfoque en el componente
+        repaint();
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                int keyCode = e.getKeyCode();
+                if (keyCode == KeyEvent.VK_ENTER) {
+                    remove(panel);
+                    // Agrega aquí el código que deseas ejecutar al presionar "Enter"
+                    // Por ejemplo, puedes llamar a un método para reiniciar el juego
+                    restartGame();
+                }
+            }
+        });
     }
 
 
 
+
+    /**
+     * Método que se encarga de pintar los componentes en el lienzo.
+     *
+     * @param g el objeto Graphics utilizado para dibujar
+     */
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+            super.paintComponent(g);
 
-        // Calcular la posición del fondo relativa a la posición de los obstáculos
-        int adjustedBackgroundX = (backgroundX % WIDTH);
-        int adjustedBackgroundY = (backgroundY % HEIGHT)*-1; // Nueva variable para el avance hacia arriba
+            // Calcular la posición del fondo relativa a la posición de los obstáculos
+            int adjustedBackgroundX = (backgroundX % WIDTH);
+            int adjustedBackgroundY = (backgroundY % HEIGHT) * -1; // Nueva variable para el avance hacia arriba
 
-        // Dibujar el fondo en la posición actual
-        //g.drawImage(backgroundImage, adjustedBackgroundX*2, -500, WIDTH, HEIGHT, null);
+            // Dibujar el fondo en la posición actual
+            // g.drawImage(backgroundImage, adjustedBackgroundX*2, -500, WIDTH, HEIGHT, null);
 
-        // Dibujar el fondo en la posición siguiente
-        g.drawImage(backgroundImage, (adjustedBackgroundX*2 + WIDTH), adjustedBackgroundY, WIDTH, HEIGHT, null);
-        g.drawImage(backgroundImage, (adjustedBackgroundX*2), adjustedBackgroundY + HEIGHT, WIDTH, HEIGHT, null);
-        g.drawImage(backgroundImage, (adjustedBackgroundX*2 + WIDTH), adjustedBackgroundY + HEIGHT, WIDTH, HEIGHT, null);
+            // Dibujar el fondo en la posición siguiente
+            g.drawImage(backgroundImage, (adjustedBackgroundX * 2 + WIDTH), adjustedBackgroundY, WIDTH, HEIGHT, null);
+            g.drawImage(backgroundImage, (adjustedBackgroundX * 2), adjustedBackgroundY + HEIGHT, WIDTH, HEIGHT, null);
+            g.drawImage(backgroundImage, (adjustedBackgroundX * 2 + WIDTH), adjustedBackgroundY + HEIGHT, WIDTH, HEIGHT, null);
 
-        for (Rectangle obstacle : Obstacle.obstacles) {
-            // Ajustar la posición del obstáculo en relación con la posición del fondo
-            int adjustedObstacleX = obstacle.x - backgroundX + adjustedBackgroundX;
-            int adjustedObstacleY = obstacle.y - backgroundY + adjustedBackgroundY*-1; // Nueva variable para el avance hacia arriba
+            for (Rectangle obstacle : Obstacle.obstacles) {
+                // Ajustar la posición del obstáculo en relación con la posición del fondo
+                int adjustedObstacleX = obstacle.x - backgroundX + adjustedBackgroundX;
+                int adjustedObstacleY = obstacle.y - backgroundY + adjustedBackgroundY * -1; // Nueva variable para el avance hacia arriba
 
-            g.drawImage(Obstacle.obstacleImage, adjustedObstacleX, adjustedObstacleY, Obstacle.OBSTACLE_WIDTH, Obstacle.OBSTACLE_HEIGHT, null);
-        }
+                g.drawImage(Obstacle.obstacleImage, adjustedObstacleX, adjustedObstacleY, Obstacle.OBSTACLE_WIDTH, Obstacle.OBSTACLE_HEIGHT, null);
+            }
 
-        // Dibujar al jugador
-        g.drawImage(Player.playerImage, Player.playerX, Player.playerY, Player.PLAYER_SIZE, Player.PLAYER_SIZE, null);
-        //Dibujar la bola
-        if (Enemy.ENEMY){
-            System.out.println(circleX+"  "+circleY);
-            g.drawImage(enemyImage,circleX, circleY, Enemy.ENEMY_RADIUS, Enemy.ENEMY_RADIUS,null);
-        }
+            // Dibujar al jugador
+            g.drawImage(Player.playerImage, Player.playerX, Player.playerY, Player.PLAYER_SIZE, Player.PLAYER_SIZE, null);
 
+            // Dibujar la bola
+            if (Enemy.ENEMY) {
+                System.out.println(circleX + "  " + circleY);
+                g.drawImage(enemyImage, circleX, circleY, Enemy.ENEMY_RADIUS, Enemy.ENEMY_RADIUS, null);
+            }
 
-
-        // Mostrar las vidas restantes
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 20));
-        for (int i = 0; i < lives; i++) {
-            int x = 10 + i * 30; // Espacio entre los círculos
-            int y = 20;
-            g.setColor(Color.RED);
-            g.drawImage(heartImage, x, y, 30, 30, null);
-        }
-
-        // Mostrar la puntuación
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 20));
-        g.drawString("Score: " + score, 10, 70);
-
-        //poner pausa
-        System.out.println(isGamePause);
-        if (isGamePause) {
-            g.drawImage(pauseImage, getWidth() - 50, 10, 30, 30, null);
+            // Mostrar las vidas restantes
             g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            for (int i = 0; i < lives; i++) {
+                int x = 10 + i * 30; // Espacio entre los círculos
+                int y = 20;
+                g.setColor(Color.RED);
+                g.drawImage(heartImage, x, y, 30, 30, null);
+            }
 
-            String text = "Pause";
-            Font font = new Font("Arial", Font.BOLD, 40);
-            FontMetrics fontMetrics = g.getFontMetrics(font);
-            int textWidth = fontMetrics.stringWidth(text);
-            int textHeight = fontMetrics.getHeight();
-            int centerX = getWidth() / 2 - textWidth / 2;
-            int centerY = getHeight() / 2 - textHeight / 2;
+            // Mostrar la puntuación
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            g.drawString("Score: " + score, 10, 70);
 
-            g.setFont(font);
-            g.drawString(text, centerX, centerY);
+            // Poner pausa
+            System.out.println(isGamePause);
+            if (isGamePause) {
+                g.drawImage(pauseImage, getWidth() - 50, 10, 30, 30, null);
+                g.setColor(Color.WHITE);
+
+                String text = "Pause";
+                Font font = new Font("Arial", Font.BOLD, 40);
+                FontMetrics fontMetrics = g.getFontMetrics(font);
+                int textWidth = fontMetrics.stringWidth(text);
+                int textHeight = fontMetrics.getHeight();
+                int centerX = getWidth() / 2 - textWidth / 2;
+                int centerY = getHeight() / 2 - textHeight / 2;
+
+                g.setFont(font);
+                g.drawString(text, centerX, centerY);
+
+                // Mensaje de instrucción para continuar
+                String text2 = "press 'R' to continue";
+                Font font2 = new Font("Arial", Font.BOLD, 20);
+                FontMetrics fontMetrics2 = g.getFontMetrics(font2);
+                int textWidth2 = fontMetrics2.stringWidth(text2);
+                int textHeight2 = fontMetrics2.getHeight();
+                int centerX2 = getWidth() / 2 - textWidth2 / 2;
+                int centerY2 = centerY + textHeight + 10;
+
+                g.setFont(font2);
+                g.drawString(text2, centerX2, centerY2);
+            } else {
+                // Dibujar la imagen del jugador en la esquina superior derecha
+                g.drawImage(Player.playerImage, getWidth() - 50, 10, 30, 30, null);
+            }
 
 
-            String text2 = "press 'R' to continue";
-            Font font2 = new Font("Arial", Font.BOLD, 20);
-            FontMetrics fontMetrics2 = g.getFontMetrics(font2);
-            int textWidth2 = fontMetrics2.stringWidth(text2);
-            int textHeight2 = fontMetrics2.getHeight();
-            int centerX2 = getWidth() / 2 - textWidth2 / 2;
-            int centerY2 = centerY + textHeight + 10;
-
-            g.setFont(font2);
-            g.drawString(text2, centerX2, centerY2);
-
-
-
-        } else {
-            g.drawImage(Player.playerImage, getWidth() - 50, 10, 30, 30, null);
-        }
 
     }
 
 
 
+    /**
+             * Ejecuta el juego.
+             *
+             * @param name el nombre de la ventana del juego
+             */
+    public void run(String name) {
+        if (isStartScreen) {
+            startScreen();
+        }
 
-
-
-    public void run(String name){
+        // Crear y configurar el marco de la ventana del juego
         JFrame frame = new JFrame(name);
         frame.add(this);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -653,7 +784,12 @@ public class Game2D extends JPanel {
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setVisible(true);
+
+        // Inicializar el audio de fondo
         AudioManager.initializeBackgroundAudio();
+
+        // Iniciar el movimiento del círculo
         MovingCircle();
     }
+
 }
