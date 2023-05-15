@@ -10,7 +10,7 @@ This is a Java application that demonstrates a simple 2D game. The game features
 
 ## Usage
 
-1. Open the `test` class located in the `org.example` package.
+1. Open the `test` class.
 2. Modify the game configurations according to your preferences. You can adjust the game speed, obstacle gap, maximum lives, gravity, and enable/disable enemies.
 3. Initialize the game images by specifying the image paths for the background, player, player damage, obstacle, heart, enemy, and pause icon.
 4. Initialize the game sounds by providing the file paths for the background music, jump sound, and game over sound.
@@ -45,12 +45,9 @@ game.setGameOverClipFile(new File("src/main/java/org/example/resources/gameOver.
 game.run("macaco");
 ```
 
-Replace `"macaco"` with your desired username. Enjoy playing the game!
+Replace `"macaco"` with your desired gamename. Enjoy playing the game!
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
 
-## Acknowledgments
-
-The game was developed as a demonstration by [org.example](https://github.com/org.example).
